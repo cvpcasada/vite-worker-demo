@@ -8,4 +8,6 @@ const obj = {
   },
 };
 
+export type TWorker = typeof obj; 
+
 Comlink.expose(obj);

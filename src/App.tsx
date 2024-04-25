@@ -3,12 +3,14 @@ import "./App.css";
 
 import * as Comlink from "comlink";
 
+import type { TWorker } from "./worker";
+
 // I'm just using comlink here as an abstraction for postMessage(...)
-const MyWorker = Comlink.wrap(
+const MyWorker = Comlink.wrap<TWorker>(
   new Worker(new URL("./worker.ts", import.meta.url), {
     type: "module",
   })
-) as unknown as { counter: Promise<number>; inc(): Promise<void> };
+);
 
 function App() {
   const [count, setCount] = useState(0);
