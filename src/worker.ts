@@ -1,13 +1,25 @@
 // note: normal imports!!!
 import * as Comlink from "comlink";
+import { proxy, snapshot, subscribe } from "valtio/vanilla";
+import { updateObject } from "sinks";
 
-const obj = {
-  counter: 0,
-  inc() {
-    this.counter++;
-  },
-};
+// ----------------------------------------------------------------------
+export class Store {
+  private initial = { count: 0, arr: [] as number[] };
+  private store = proxy(structuredClone(this.initial));
+  destroy: () => void;
 
-export type TWorker = typeof obj; 
+  constructor() {
+    this.destroy = subscribe(this.store, () => {
+      console.log("w: ", snapshot(this.store));
+    });
+  }
 
-Comlink.expose(obj);
+  // our schema is large so we only send store diffs to worker
+  updateStore(diff: unknown) {
+    Object.assign(this.store, updateObject(this.store, diff));
+  }
+
+}
+
+Comlink.expose(new Store());
